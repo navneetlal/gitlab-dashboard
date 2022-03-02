@@ -9,3 +9,42 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Group {
+  id          Int       @id @unique
+  name        String
+  path        String
+  description String?
+  web_url     String
+  created_at  DateTime
+  projects    Project[]
+}
+
+model Project {
+  id                  Int      @id @unique
+  name                String
+  path                String
+  path_with_namespace String
+  description         String?
+  web_url             String
+  group               Group    @relation(fields: [group_id], references: [id], onDelete: Cascade)
+  group_id            Int
+  created_at          DateTime
+  last_activity_at    DateTime
+  commits             Commit[]
+}
+
+model Commit {
+  id              Int      @id @unique
+  title           String
+  message         String
+  committer_name  String
+  committer_email String
+  committed_date  DateTime
+  stats_addition  Int?
+  stats_deletion  Int?
+  project         Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  project_id      Int
+
+  @@index([committer_email])
+}

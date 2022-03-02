@@ -1,26 +1,54 @@
 import { Injectable } from '@nestjs/common';
-import { CreateCommitDto } from './dto/create-commit.dto';
-import { UpdateCommitDto } from './dto/update-commit.dto';
+import { Commit, Prisma } from '@prisma/client';
+import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class CommitsService {
-  create(createCommitDto: CreateCommitDto) {
-    return 'This action adds a new commit';
+  constructor(private prisma: PrismaService) { }
+
+  create(data: Prisma.CommitCreateInput): Promise<Commit> {
+    return this.prisma.commit.create({
+      data,
+    });
   }
 
-  findAll() {
-    return `This action returns all commits`;
+  async findAll(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.CommitWhereUniqueInput;
+    where?: Prisma.CommitWhereInput;
+    orderBy?: Prisma.CommitOrderByWithRelationInput;
+  }): Promise<Commit[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+    return this.prisma.commit.findMany({
+      skip,
+      take,
+      cursor,
+      where,
+      orderBy,
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} commit`;
+  async findOne(commitWhereUniqueInput: Prisma.CommitWhereUniqueInput): Promise<Commit> {
+    return this.prisma.commit.findUnique({
+      where: commitWhereUniqueInput
+    });
   }
 
-  update(id: number, updateCommitDto: UpdateCommitDto) {
-    return `This action updates a #${id} commit`;
+  async update(params: {
+    where: Prisma.CommitWhereUniqueInput;
+    data: Prisma.CommitUpdateInput;
+  }): Promise<Commit> {
+    const { where, data } = params;
+    return this.prisma.commit.update({
+      data,
+      where,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} commit`;
+  async remove(where: Prisma.CommitWhereUniqueInput): Promise<Commit> {
+    return this.prisma.commit.delete({
+      where,
+    });
   }
 }

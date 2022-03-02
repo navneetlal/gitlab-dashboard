@@ -1,26 +1,54 @@
 import { Injectable } from '@nestjs/common';
-import { CreateGroupDto } from './dto/create-group.dto';
-import { UpdateGroupDto } from './dto/update-group.dto';
+import { Group, Prisma } from '@prisma/client';
+import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class GroupsService {
-  create(createGroupDto: CreateGroupDto) {
-    return 'This action adds a new group';
+  constructor(private prisma: PrismaService) { }
+
+  create(data: Prisma.GroupCreateInput): Promise<Group> {
+    return this.prisma.group.create({
+      data,
+    });
   }
 
-  findAll() {
-    return `This action returns all groups`;
+  async findAll(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.GroupWhereUniqueInput;
+    where?: Prisma.GroupWhereInput;
+    orderBy?: Prisma.GroupOrderByWithRelationInput;
+  }): Promise<Group[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+    return this.prisma.group.findMany({
+      skip,
+      take,
+      cursor,
+      where,
+      orderBy,
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} group`;
+  async findOne(groupWhereUniqueInput: Prisma.GroupWhereUniqueInput): Promise<Group> {
+    return this.prisma.group.findUnique({
+      where: groupWhereUniqueInput
+    });
   }
 
-  update(id: number, updateGroupDto: UpdateGroupDto) {
-    return `This action updates a #${id} group`;
+  async update(params: {
+    where: Prisma.GroupWhereUniqueInput;
+    data: Prisma.GroupUpdateInput;
+  }): Promise<Group> {
+    const { where, data } = params;
+    return this.prisma.group.update({
+      data,
+      where,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} group`;
+  async remove(where: Prisma.GroupWhereUniqueInput): Promise<Group> {
+    return this.prisma.group.delete({
+      where,
+    });
   }
 }
